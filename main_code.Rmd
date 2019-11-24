@@ -53,14 +53,14 @@ nkvd_leaders$full_name <- all_texts %>%
 
 nkvd_leaders$birth_year <- all_texts %>% 
   map_chr(2) %>% 
-  map(str_extract_all, pattern = "[:digit:][:digit:][:digit:][:digit:]") %>% 
+  map(str_extract_all, pattern = "[:digit:]{4}") %>% 
   map(1) %>% 
   map(1) %>% 
   map(as.integer)
 
 nkvd_leaders$death_year <- all_texts %>% 
   map_chr(2) %>% 
-  map(str_extract_all, pattern = "[:digit:][:digit:][:digit:][:digit:]") %>% 
+  map(str_extract_all, pattern = "[:digit:]{4}") %>% 
   map(1) %>% 
   map(2) %>% 
   map(as.integer)
@@ -77,135 +77,33 @@ nkvd_leaders$party_entrance_year <- communist_party_entrance_date %>%
   map(~ str_c("19", .)) %>% 
   map(as.numeric)
 
+nkvd_leaders$party_entrance_month <- communist_party_entrance_date %>% 
+  map(1) %>% 
+  map(as.numeric)
 
 
 
-string <- all_texts %>% 
-  map_chr(3)
+nkvd_leaders$ethnicity <-all_texts %>% 
+  map_chr(3) %>% 
+  gsub("^Родился в семье (.+?)\\. (.+?)\\. .*$", "\\2", ., perl = TRUE) # %>%  map(as.factor)
 
-string <- all_texts %>% 
-  map_chr(`[[`, 3)
-
-stri_locale_list()
-
-stri_locale_set( "ru_RU")
-stri_locale_info()
-stri_locale_get()
-
-
-c(string) %>% map(~ 
-substr(.,
-       str_locate(., pattern = ".*В КП с ([:digit:][:digit:]\\.[:digit:][:digit:]\\.)")[,1],
-       str_locate(., pattern = ".*В КП с ([:digit:][:digit:]\\.[:digit:][:digit:]\\.)")[,2])
-)
-
-str_extract(string, pattern = regex(".*В КП с ([:digit:][:digit:]\\.[:digit:][:digit:]\\.)", locale =  "ru_RU"))
-
-
-grep(".*В КП с (\\d{2}\\.\\d{2}\\.)", string, value = TRUE, perl = TRUE)
-
-regmatches(string, regexpr("^.*В КП с (\\d{2}\\.\\d{2}\\.).*$", string)) 
-
-
-
-substr(c(string),
-       grep(x = string[1], pattern = "В КП с [:digit:][:digit:]\\.[:digit:][:digit:]\\.")[,1],
-       str_locate(string, pattern = "В КП с [:digit:][:digit:]\\.[:digit:][:digit:]\\.")[,2])
-
-
-class(string)
-
-string <- c("ttttt Родился в семье столяра. Украинец. В КП с 08.29.",
-            "Родился в семье рабочего-давильщика. Русский. В КП с 06.28.",
-            "Родился в семье крестьянина-бедняка. Даргинец. В КП с 20.11.32.",
-            "Родился в семье рабочего-давильщика. Русский. В КП с 06.28.",
-            "Родился в семье рабочего-нефтяника. Армянин. В КП с 07.38 (кандидат с 11.32).")
-
-string <- string[1:3]
-
-all_texts[[2]]
-
-html_session(str_c(memo_site, iframe)) %>%
-    html_nodes("body > div > p") %>%  html_text()
-
-
-str_extract("Родился в семье столяра. Украинец. В КП с 08.29.", pattern = "Родился")
-
-
-grep(pattern = "Родился", "Родился в семье столяра. Украинец. В КП с 08.29.", perl=TRUE)
-
-grep(pattern = "^.*(\\d)", "Hi! How are you?  08.29.")
-
-gregexpr(pattern = "Hi", "Hi! How are you?  08.29.")
-
-pat <- ".*\\.D([0-9]+)\\.LIS.*"
-sub(pat, "\\1", alice[grepl(pat, alice)])
-
-
-stri_enc_detect(unlist(all_texts[[1]]))
-
-str_match("Родился в семье столяра. Украинец. В КП с 08.29.", pattern = "Родился")
-
-
-string <- "Родился в семье столяра. Украинец. В КП с 08.29."
-
-string_match_locations <- str_locate(string, pattern = "В КП")
-
-
-
-str_extract("Hi! How are you? В КП с 08.29.", pattern = "Hi")
-
-
-
-person_birth <- html_session(str_c(memo_site, iframe)) %>%
-    html_nodes("body > div > p:nth-child(2)") %>%
-    html_text()
-
-person_name <- html_session(str_c(memo_site, iframe)) %>%
-    html_nodes("body > div > p:nth-child(1)") %>%
-    html_text()
-
-person_family_background <- html_session(str_c(memo_site, iframe)) %>%
-    html_nodes("body > div > p:nth-child(3)") %>%
-    html_text()
-
-person_family_background <- html_session(str_c(memo_site, iframe)) %>%
-    html_nodes("body > div > p:nth-child(4)") %>%
-    html_text()
-
-
-html_session(str_c(memo_site, iframe)) %>%
-    html_nodes("body > div") %>% 
-  html_text()
-
-
-
-body > div > p:nth-child(2)
-
-my_session("http://old.memo.ru/history/nkvd/kto2/")%>% 
- # read_html() %>% 
-  html_nodes(xpath = "//html//frameset//frame") %>% 
-  extract2(3) %>% 
-  html_attr("src") %>% 
-  read_html()
-
-
-"http://old.memo.ru/history/nkvd/kto2/" %>% 
-  read_html() %>% 
-  html_nodes(xpath = "//html//frameset//frame") %>% 
-  extract2(3) %>% 
-  html_attr("src")
+nkvd_leaders %>%
+  count(ethnicity, sort = T) %>% 
+  View()
 
 
 
 
-html > frameset > frame
 
-body > div > p:nth-child(1)
+all_texts %>% 
+  map_chr(3) %>% 
+  sub("^Родился в семье (.+?)\\. ", "\\2", ., perl = TRUE) 
 
-html
 
-<p>Родился в семье учителя. Армянин. В КП с 09.40.</p>
+all_texts %>% 
+  map_chr(3) %>% 
+  sub("^Родился в семье ((.+?)(?=\\. ))", "\\1", ., perl = TRUE)
+
 ```
 
 
@@ -285,31 +183,5 @@ nchar("                             Руководители органов НК
 
 
 
-Dumpster 
-```{r}
-nkvd_lists <- read_html("http://old.memo.ru/history/nkvd/kto2/")
-
-http://old.memo.ru/history/nkvd/kto2/kto_2-0001.html
-
-nkvd_lists <- html("http://old.memo.ru/history/nkvd/kto2-0001.html")
-
-nkvd_one <- read_html("http://old.memo.ru/history/nkvd/kto2-0001.html")
-
-
-/html/body/div/p[1]
-
-
-html > frameset > frame
-/html/frameset/frame
-
-nkvd_lists %>% 
-  xml_node("body > div > p:nth-child(1)")
-
-nkvd_lists %>% 
-  html_nodes("html > frameset > frame")
-
-memo_site <- "http://old.memo.ru/history/nkvd/kto2/"
-
-```
 
 
