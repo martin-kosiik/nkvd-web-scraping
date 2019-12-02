@@ -18,6 +18,39 @@ Sys.setlocale("LC_CTYPE", "russian")
 
 ```
 
+## Period from 1934 to 1941
+```{r}
+memo_site <- "http://old.memo.ru/history/nkvd/kto/biogr/index.htm"
+
+
+iframe <- html_session("http://old.memo.ru/history/nkvd/kto/biogr/index.htm")%>% 
+  html_nodes(xpath = "//html//frameset//frame") %>% 
+  magrittr::extract2(3) %>% 
+  html_attr("src") 
+
+number_of_leaders = 572
+
+all_iframes <- str_c("gb", 1:number_of_leaders, ".htm")
+
+get_htmls <- function(iframe, memo_site = "http://old.memo.ru/history/nkvd/kto/biogr/") {
+  html_session(str_c(memo_site, iframe)) %>%
+    html_nodes("body > div > p")
+}
+
+all_htmls <- all_iframes %>% 
+  map(get_htmls)
+
+all_texts <- all_htmls %>% 
+  map(html_text)
+
+```
+
+Extract information from the text
+```{r}
+nkvd_leaders_pre_war <- tibble(.rows = number_of_leaders)
+```
+
+## Period from 1941 to 1954
 Download the data and convert them to text
 ```{r}
 memo_site <- "http://old.memo.ru/history/nkvd/kto2/"
@@ -32,13 +65,9 @@ number_of_leaders = 1308
 
 all_iframes <- str_c("kto_2-", str_pad(1:number_of_leaders, 4, pad = "0"), ".html")
 
-get_htmls <- function(iframe, memo_site = "http://old.memo.ru/history/nkvd/kto2/") {
-  html_session(str_c(memo_site, iframe)) %>%
-    html_nodes("body > div > p")
-}
 
 all_htmls <- all_iframes %>% 
-  map(get_htmls)
+  map(get_htmls, memo_site = "http://old.memo.ru/history/nkvd/kto2/")
 
 all_texts <- all_htmls %>% 
   map(html_text)
