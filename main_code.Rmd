@@ -90,12 +90,17 @@ nkvd_leaders$birth_year <- all_texts %>%
   map(1) %>% 
   map(as.integer)
 
+nkvd_leaders$birth_year <- as.integer(nkvd_leaders$birth_year)
+
+
 nkvd_leaders$death_year <- all_texts %>% 
   map_chr(2) %>% 
   map(str_extract_all, pattern = "[:digit:]{4}") %>% 
   map(1) %>% 
   map(2) %>% 
   map(as.integer)
+
+nkvd_leaders$death_year <- as.integer(nkvd_leaders$death_year)
 
 
 #all_texts %>% 
@@ -114,10 +119,14 @@ nkvd_leaders$party_entrance_year <- communist_party_entrance_date %>%
   map(~ str_c("19", .)) %>% 
   map(as.numeric)
 
+nkvd_leaders$party_entrance_year <- as.numeric(nkvd_leaders$party_entrance_year)
+
+
 nkvd_leaders$party_entrance_month <- communist_party_entrance_date %>% 
   map(1) %>% 
   map(as.numeric)
 
+nkvd_leaders$party_entrance_month <- as.numeric(nkvd_leaders$party_entrance_month)
 
 
 nkvd_leaders$ethnicity <-all_texts %>% 
@@ -128,7 +137,7 @@ nkvd_leaders %>%
   count(ethnicity, sort = T) 
 
 
-
+write_csv(nkvd_leaders, "nkvd_leaders_1941_to_1954.csv")
 
 
 #all_texts %>% 
